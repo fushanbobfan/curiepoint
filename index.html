@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Curiepoint</title>
+  <meta name="description" content="The 2D Ising model in the browser: cool a lattice of magnetic spins through its critical temperature and watch order appear." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 4'%3E%3Cpath fill='%2322284a' d='M0 0h4v4H0z'/%3E%3Cpath fill='%23f2a65a' d='M0 0h2v1H0zM1 1h2v1H1zM2 2h2v2H2zM0 3h1v1H0z'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>Curiepoint</h1>
+    <p class="subtitle">A square lattice of magnetic spins, each up or down, shaken by heat. Cool it past the critical temperature and domains grow until one direction wins.</p>
+  </header>
+
+  <main>
+    <section class="stage" aria-label="Lattice">
+      <div class="lattice-wrap">
+        <canvas id="lattice" width="128" height="128" role="img" aria-label="Ising lattice: light cells are up spins, dark cells are down spins"></canvas>
+      </div>
+      <div class="stage-bar">
+        <p id="status" class="status" aria-live="polite"></p>
+        <div class="buttons">
+          <button id="pause" type="button">Pause</button>
+          <button id="step" type="button">Step</button>
+        </div>
+      </div>
+      <p class="hint">Drag on the lattice to paint up spins; hold Shift (or right-drag) to paint down spins.</p>
+    </section>
+
+    <section class="controls" aria-label="Controls">
+      <fieldset>
+        <legend>Temperature</legend>
+        <p class="readout"><output id="temp-value" for="temp">—</output></p>
+        <label class="visually-hidden" for="temp">Temperature</label>
+        <input id="temp" type="range" min="0.5" max="5" step="0.01" value="2.27" />
+        <div class="buttons">
+          <button id="to-tc" type="button">Set to T<sub>c</sub></button>
+          <button id="quench" type="button">Quench to 1.0</button>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>External field</legend>
+        <p class="readout"><output id="field-value" for="field">—</output></p>
+        <label class="visually-hidden" for="field">External field h</label>
+        <input id="field" type="range" min="-1" max="1" step="0.01" value="0" />
+        <div class="buttons">
+          <button id="field-zero" type="button">Field off</button>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Simulation</legend>
+        <div class="control-row">
+          <label for="algorithm">Update rule</label>
+          <select id="algorithm"></select>
+        </div>
+        <div class="control-row">
+          <label for="size">Lattice</label>
+          <select id="size">
+            <option value="64">64 × 64</option>
+            <option value="128" selected>128 × 128</option>
+            <option value="256">256 × 256</option>
+          </select>
+        </div>
+        <div class="control-row">
+          <label for="speed">Sweeps per frame</label>
+          <output id="speed-value" for="speed">1</output>
+          <input id="speed" type="range" min="0" max="4" step="1" value="1" />
+        </div>
+        <div class="buttons">
+          <button id="init-random" type="button">Randomize</button>
+          <button id="init-up" type="button">All up</button>
+          <button id="init-down" type="button">All down</button>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Display</legend>
+        <div class="control-row">
+          <label for="palette">Colours</label>
+          <select id="palette"></select>
+        </div>
+        <div class="control-row">
+          <label for="walls">Outline domain walls</label>
+          <input id="walls" type="checkbox" />
+        </div>
+        <div class="control-row">
+          <label for="brush">Brush radius</label>
+          <output id="brush-value" for="brush">6</output>
+          <input id="brush" type="range" min="1" max="24" step="1" value="6" />
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Measurements</legend>
+        <dl class="stats">
+          <dt>Magnetization m</dt><dd id="stat-m">—</dd>
+          <dt>Energy per spin</dt><dd id="stat-e">—</dd>
+          <dt>⟨|m|⟩ recent</dt><dd id="stat-absm">—</dd>
+          <dt>Onsager m(T)</dt><dd id="stat-onsager">—</dd>
+          <dt>Susceptibility χ</dt><dd id="stat-chi">—</dd>
+          <dt>Heat capacity C</dt><dd id="stat-heat">—</dd>
+        </dl>
+        <p class="hint">Recent averages use the last 200 sweeps and restart when a setting changes.</p>
+      </fieldset>
+    </section>
+  </main>
+
+  <footer>
+    <p>Units with J = k<sub>B</sub> = 1 and periodic edges. The critical temperature of the infinite lattice is T<sub>c</sub> = 2 / ln(1 + √2) ≈ 2.269.</p>
+  </footer>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

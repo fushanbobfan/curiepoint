@@ -75,7 +75,8 @@ function updateStats() {
   $('stat-absm').textContent = r ? fmt(r.absM) : '—';
   $('stat-chi').textContent = r && r.samples >= 20 ? fmt(r.chi, 2) : '—';
   $('stat-heat').textContent = r && r.samples >= 20 ? fmt(r.heat, 2) : '—';
-  const where = state.T < CRITICAL_TEMPERATURE ? 'ordered side' : 'disordered side';
+  const ratio = state.T / CRITICAL_TEMPERATURE;
+  const where = Math.abs(ratio - 1) < 0.01 ? 'at the critical point' : ratio < 1 ? 'ordered side' : 'disordered side';
   $('status').textContent = `Sweep ${state.sweeps.toLocaleString()} · ${where}${state.running ? '' : ' · paused'}`;
 }
 

@@ -197,6 +197,52 @@ button[aria-pressed="true"] {
   text-align: right;
 }
 
+.chart-block {
+  max-width: min(100%, calc(100vh - 11rem));
+}
+
+.chart {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: 4px;
+}
+
+.legend {
+  margin: 0.3rem 0 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.key {
+  display: inline-block;
+  width: 1.2em;
+  height: 0.25em;
+  vertical-align: middle;
+  margin: 0 0.25em 0 0.6em;
+  border-radius: 2px;
+}
+
+.key:first-child {
+  margin-left: 0;
+}
+
+.key-first {
+  background: var(--accent);
+}
+
+.key-second {
+  background: var(--focus);
+}
+
+progress {
+  width: 100%;
+  margin-top: 0.5rem;
+  accent-color: var(--accent);
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -211,7 +257,7 @@ button[aria-pressed="true"] {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .lattice-wrap, .stage-bar {
+  .lattice-wrap, .stage-bar, .chart-block {
     width: 100%;
     max-width: 100%;
   }

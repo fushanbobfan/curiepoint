@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { PAD, formatTick, linear, niceRange, tracePoints } from '../src/chart.js';
+import { PAD, formatTick, linear, niceRange, scanRange, tracePoints } from '../src/chart.js';
 import { createSeries, pushSample } from '../src/observables.js';
 
 test('linear maps the domain ends onto the range ends', () => {
@@ -41,4 +41,15 @@ test('ticks keep a sensible number of digits', () => {
   assert.equal(formatTick(-1.5), '-1.50');
   assert.equal(formatTick(42.25), '42.3');
   assert.equal(formatTick(250), '250');
+});
+
+test('scan ranges fix |m| to 0..1 and start fluctuation axes at zero', () => {
+  const results = [{ T: 2, absM: 0.9999, e: -1.7, chi: 3.2, heat: 1.1 }, { T: 3, absM: 0.02, e: -0.8, chi: 0.4, heat: 0.5 }];
+  assert.deepEqual(scanRange(results, 'absM', null, [1, 4]), [0, 1]);
+  const [c0, c1] = scanRange(results, 'chi', null, [1, 4]);
+  assert.equal(c0, 0);
+  assert.ok(c1 >= 3.2);
+  assert.deepEqual(scanRange([], 'heat', null, [1, 4]), [0, 0.5]);
+  const [e0, e1] = scanRange(results, 'e', (T) => -2 / T, [1, 4]);
+  assert.ok(e0 <= -2 && e1 >= -0.5);
 });

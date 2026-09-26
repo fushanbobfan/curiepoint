@@ -43,6 +43,16 @@ export function niceRange(values, minSpan = 1) {
   return [Math.floor(lo / step) * step, Math.ceil(hi / step) * step];
 }
 
+// Vertical range for a scan plot. |m| always spans 0..1; fluctuation measures
+// are never negative, so their axis starts at zero.
+export function scanRange(results, key, exact, tRange) {
+  if (key === 'absM') return [0, 1];
+  const values = results.map((p) => p[key]);
+  if (exact) for (let i = 0; i <= 40; i++) values.push(exact(tRange[0] + ((tRange[1] - tRange[0]) * i) / 40));
+  const [lo, hi] = niceRange(values, 0.5);
+  return key === 'chi' || key === 'heat' ? [0, Math.max(hi, 0.5)] : [lo, hi];
+}
+
 function frame(ctx, width, height, colours) {
   ctx.clearRect(0, 0, width, height);
   ctx.strokeStyle = colours.grid;
@@ -97,9 +107,7 @@ export function drawTrace(ctx, series, width, height, colours) {
 // curve when one exists and a marker at Tc.
 export function drawScan(ctx, results, key, exact, tRange, width, height, colours, tc) {
   frame(ctx, width, height, colours);
-  const values = results.map((p) => p[key]);
-  if (exact) for (let i = 0; i <= 40; i++) values.push(exact(tRange[0] + ((tRange[1] - tRange[0]) * i) / 40));
-  const [lo, hi] = niceRange(values, key === 'absM' ? 1 : 0.5);
+  const [lo, hi] = scanRange(results, key, exact, tRange);
   const x = linear(tRange[0], tRange[1], PAD.left, width - PAD.right);
   const y = linear(lo, hi, height - PAD.bottom, PAD.top);
   yLabels(ctx, lo, hi, height);

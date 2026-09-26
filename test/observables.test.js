@@ -1,7 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  CRITICAL_TEMPERATURE, clearSeries, createSeries, onsagerMagnetization, pushSample, sampleAt, summarize,
+  CRITICAL_TEMPERATURE, clearSeries, createSeries, ellipticK, onsagerEnergy, onsagerMagnetization, pushSample, sampleAt,
+  summarize,
 } from '../src/observables.js';
 
 test('the critical temperature is 2 / ln(1 + sqrt 2) ≈ 2.269', () => {
@@ -46,4 +47,27 @@ test('summaries use only the requested window and read fluctuations', () => {
   assert.equal(r.chi, 0);
   // Var(e) = 0.25, so C = 100 * 0.25 / 4.
   assert.ok(Math.abs(r.heat - 6.25) < 1e-12);
+});
+
+test('the elliptic integral matches known values', () => {
+  assert.ok(Math.abs(ellipticK(0) - Math.PI / 2) < 1e-15);
+  assert.ok(Math.abs(ellipticK(0.5) - 1.685750354812596) < 1e-12);
+  assert.ok(ellipticK(0.999999) > 7);
+});
+
+test('Onsager energy runs from -2 at T = 0 through -sqrt 2 at Tc toward 0', () => {
+  assert.equal(onsagerEnergy(0), -2);
+  assert.ok(Math.abs(onsagerEnergy(0.5) + 2) < 1e-5);
+  assert.ok(Math.abs(onsagerEnergy(CRITICAL_TEMPERATURE) + Math.SQRT2) < 1e-12);
+  // Continuous through Tc even though K diverges there.
+  assert.ok(Math.abs(onsagerEnergy(CRITICAL_TEMPERATURE - 1e-6) + Math.SQRT2) < 1e-4);
+  assert.ok(Math.abs(onsagerEnergy(CRITICAL_TEMPERATURE + 1e-6) + Math.SQRT2) < 1e-4);
+  // High-temperature series: u ≈ -2 tanh(1/T).
+  assert.ok(Math.abs(onsagerEnergy(50) + 2 * Math.tanh(1 / 50)) < 1e-4);
+  let last = -2;
+  for (let T = 0.6; T < 6; T += 0.1) {
+    const u = onsagerEnergy(T);
+    assert.ok(u > last, `not increasing at T = ${T}`);
+    last = u;
+  }
 });

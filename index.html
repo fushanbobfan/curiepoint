@@ -27,6 +27,19 @@
         </div>
       </div>
       <p class="hint">Drag on the lattice to paint up spins; hold Shift (or right-drag) to paint down spins.</p>
+
+      <section class="chart-block" aria-labelledby="trace-title">
+        <h2 id="trace-title">Recent sweeps</h2>
+        <canvas id="trace" class="chart" width="640" height="150" role="img" aria-label="Magnetization and energy per spin over the most recent sweeps"></canvas>
+        <p class="legend"><span class="key key-first"></span> magnetization m <span class="key key-second"></span> energy per spin ÷ 2</p>
+      </section>
+
+      <section class="chart-block" aria-labelledby="scan-title">
+        <h2 id="scan-title">Temperature scan</h2>
+        <canvas id="scan-chart" class="chart" width="640" height="220" role="img" aria-label="Scan results against temperature"></canvas>
+        <p class="legend"><span class="key key-first"></span> measured on this lattice <span class="key key-second"></span> exact, infinite lattice (Onsager)</p>
+        <p id="scan-summary" class="hint" aria-live="polite">Run a scan to cool the lattice step by step and measure each temperature.</p>
+      </section>
     </section>
 
     <section class="controls" aria-label="Controls">
@@ -92,6 +105,32 @@
           <output id="brush-value" for="brush">6</output>
           <input id="brush" type="range" min="1" max="24" step="1" value="6" />
         </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Scan</legend>
+        <div class="control-row">
+          <label for="scan-points">Temperatures</label>
+          <select id="scan-points">
+            <option value="16">16 (quick)</option>
+            <option value="31" selected>31</option>
+            <option value="61">61 (fine)</option>
+          </select>
+        </div>
+        <div class="control-row">
+          <label for="scan-quantity">Plot</label>
+          <select id="scan-quantity">
+            <option value="absM" selected>⟨|m|⟩</option>
+            <option value="e">Energy per spin</option>
+            <option value="chi">Susceptibility χ</option>
+            <option value="heat">Heat capacity C</option>
+          </select>
+        </div>
+        <div class="buttons">
+          <button id="scan-run" type="button">Cool from 4.0 to 1.0</button>
+        </div>
+        <progress id="scan-progress" max="1" value="0" aria-label="Scan progress"></progress>
+        <p class="hint">Each temperature gets 100 settling and 200 measured sweeps. Wolff updates settle fastest near T<sub>c</sub>.</p>
       </fieldset>
 
       <fieldset>

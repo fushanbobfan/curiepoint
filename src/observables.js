@@ -11,6 +11,31 @@ export function onsagerMagnetization(T) {
   return Math.pow(1 - Math.pow(s, -4), 1 / 8);
 }
 
+// Complete elliptic integral of the first kind K(k) via the arithmetic-geometric mean.
+export function ellipticK(k) {
+  let a = 1;
+  let b = Math.sqrt(1 - k * k);
+  for (let i = 0; i < 40 && Math.abs(a - b) > 1e-15; i++) {
+    const next = (a + b) / 2;
+    b = Math.sqrt(a * b);
+    a = next;
+  }
+  return Math.PI / (2 * a);
+}
+
+// Onsager's internal energy per spin of the infinite lattice at h = 0.
+// K is the modulus 2 sinh(2/T) / cosh^2(2/T); at Tc it reaches 1 and the
+// integral diverges, but its prefactor vanishes there, leaving -sqrt(2).
+export function onsagerEnergy(T) {
+  if (T <= 0) return -2;
+  const b = 2 / T;
+  const t = Math.tanh(b);
+  const k = (2 * Math.sinh(b)) / (Math.cosh(b) ** 2);
+  const prefactor = 2 * t * t - 1;
+  const integral = Math.abs(prefactor) < 1e-12 ? 0 : prefactor * ellipticK(Math.min(k, 1 - 1e-16));
+  return -(1 / t) * (1 + (2 / Math.PI) * integral);
+}
+
 // Fixed-length history of magnetization and energy per spin.
 export function createSeries(capacity = 600) {
   return { capacity, m: new Float64Array(capacity), e: new Float64Array(capacity), start: 0, length: 0 };
